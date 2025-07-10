@@ -5,7 +5,6 @@ import { NavItem } from "@/types/nav";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/Icons";
-import { Button } from "@/components/ui/button";
 
 interface MainNavProps {
   items?: NavItem[];
@@ -13,16 +12,22 @@ interface MainNavProps {
 
 export function MainNav({ items }: MainNavProps) {
   return (
-    <div className="flex gap-6 md:gap-10">
-      <Link href="/" className="hidden items-center space-x-2 md:flex">
+    <div className="flex w-full items-center gap-6 md:gap-10">
+      {/* Logo icon only */}
+      <Link href="/" className="hidden items-center md:flex">
         <Icons.logo className="h-6 w-6 dark:text-white" />
-        <span className="hidden font-bold sm:inline-block dark:text-white">
-          {siteConfig.name}
-        </span>
       </Link>
+
+      <div
+        className="mx-auto font-bold text-center text-lg"
+        style={{ color: "#6b33b0" }}
+      >
+        Generate Diagrams and Flowcharts using GenDiag
+      </div>
+
       {items?.length ? (
         <nav className="hidden gap-6 md:flex">
-          {items?.map(
+          {items.map(
             (item, index) =>
               item.href && (
                 <Link
@@ -39,13 +44,6 @@ export function MainNav({ items }: MainNavProps) {
           )}
         </nav>
       ) : null}
-      <Button
-        variant="ghost"
-        className="-ml-4 text-base hover:bg-transparent focus:ring-0 md:hidden dark:text-white"
-      >
-        <Icons.logo className="mr-2 h-4 w-4" />{" "}
-        <span className="text-xl">Text2Diagram: Create diagrams with natural language.</span>
-      </Button>
     </div>
   );
 }

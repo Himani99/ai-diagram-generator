@@ -5,12 +5,14 @@ import { useAtom } from "jotai";
 
 import { apiKeyAtom, modelAtom } from "@/lib/atom";
 import { Mermaid } from "@/components/Mermaids";
+import SVG from "@/components/SVG";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
 import type { Message, RequestBody } from "@/types/type";
-import { parseCodeFromMessage } from "@/lib/utils";
+import { parseCodeFromMessage, parseCodeFromMessageSVG } from "@/lib/utils";
 import type { OpenAIModel } from "@/types/type";
+import SVGRender from "@/components/SVG";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
@@ -19,6 +21,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draftOutputCode, setDraftOutputCode] = useState<string>("");
   const [outputCode, setOutputCode] = useState<string>("");
+  
 
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
@@ -114,6 +117,7 @@ export default function Home() {
       <div className="border w-full md:w-3/4 p-2 flex flex-col">
         <div className="flex-1 flex justify-center border relative">
           <Mermaid chart={outputCode} />
+          {/* <SVGRender code={draftOutputCode}/> */}
         </div>
         <CodeBlock code={draftOutputCode} />
       </div>

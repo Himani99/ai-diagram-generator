@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    
     "@radix-ui/react-hover-card": "^1.0.5",
     "@radix-ui/react-label": "^2.0.1",
     "@radix-ui/react-popover": "^1.0.5",
@@ -20,6 +21,7 @@
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.5.1",
     "clsx": "^1.2.1",
+    "dompurify": "^3.2.6",
     "endent": "^2.1.0",
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",

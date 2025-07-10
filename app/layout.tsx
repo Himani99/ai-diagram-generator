@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata = {
-  title: "Text2Diagram:Create diagrams with natural language",
+  title: "Generate Diagrams and Flowcharts using GenDiag",
   description:
-    "Draw flowchart, sequence diagram, class diagram, user journey, gantt, C4C, Mindmap, Timeline diagram with nature language.",
+    "Create flowcharts, sequence diagrams, class diagrams, user journeys, Gantt charts, C4 models, mind maps, and timelines effortlessly — just by using natural language. GenDiag turns your ideas into professional diagrams in seconds.",
 };
 
 const fontSans = FontSans({

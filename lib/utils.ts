@@ -22,6 +22,13 @@ const systemPrompt = endent`
   Code (no \`\`\`):
   `;
 
+const systemPromptSVG = endent`
+  You are an assistant to help user build infographics diagram with svg code.
+  You only need to return the output SVG code block.
+  Do not include any description, do not include the \`\`\`.
+  Code (no \`\`\`):
+  `;
+
 export const OpenAIStream = async (
   messages: Message[],
   model: string,
@@ -90,6 +97,18 @@ export const OpenAIStream = async (
 
 export const parseCodeFromMessage = (message: string) => {
   const regex = /```(?:mermaid)?\s*([\s\S]*?)```/;
+  const match = message.match(regex);
+
+  if (match) {
+    return match[1];
+  } else {
+    return message;
+  }
+};
+
+export const parseCodeFromMessageSVG = (message: string) => {
+  console.log('DEBUG', message)
+  const regex = /<svg[\s\S]*?<\/svg>/;
   const match = message.match(regex);
 
   if (match) {
