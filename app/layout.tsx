@@ -1,4 +1,3 @@
-
 import "./globals.css";
 
 import { Analytics } from "@vercel/analytics/react";
@@ -6,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ContextProvider } from "./context";
 
 export const metadata = {
   title: "Text2Diagram:Create diagrams with natural language",
@@ -32,10 +32,11 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <SiteHeader />
-        {children}
-
-        <Analytics />
+        <ContextProvider>
+          <SiteHeader />
+          {children}
+          <Analytics />
+        </ContextProvider>
       </body>
     </html>
   );

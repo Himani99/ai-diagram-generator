@@ -9,26 +9,37 @@ import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
 import type { Message, RequestBody } from "@/types/type";
-import { parseCodeFromMessage } from "@/lib/utils";
+import { parseMermaidCodeFromMessage, parseSvgCodeFromMessage } from "@/lib/utils";
 import type { OpenAIModel } from "@/types/type";
+import { useContextValues } from "./context";
+import { parse } from "path";
+import SVGRender from "@/components/SVG";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
-  const [draftMessage, setDraftMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [draftOutputCode, setDraftOutputCode] = useState<string>("");
-  const [outputCode, setOutputCode] = useState<string>("");
+
+  const { 
+    draftMessage, setDraftMessage, 
+    messages, setMessages, 
+    draftOutputCode, setDraftOutputCode, 
+    outputCode, setOutputCode,
+    mode, setMode
+  } = useContextValues();
 
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
     const model = localStorage.getItem("model");
+    const mode = localStorage.getItem("mode") || 'mermaid';
 
     if (apiKey) {
       setApiKey(apiKey);
     }
     if (model) {
       setModel(model as OpenAIModel);
+    }
+    if (mode) {
+      setMode(mode as 'mermaid' | 'svg');
     }
   }, []);
 
@@ -54,7 +65,7 @@ export default function Home() {
     setDraftOutputCode("");
 
     const controller = new AbortController();
-    const body: RequestBody = { messages: newMessages, model, apiKey };
+    const body: RequestBody = { messages: newMessages, model, apiKey, mode };
 
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -88,7 +99,7 @@ export default function Home() {
       code += chunkValue;
       setDraftOutputCode((prevCode) => prevCode + chunkValue);
     }
-    setOutputCode(parseCodeFromMessage(code));
+    setOutputCode(mode === 'mermaid' ? parseMermaidCodeFromMessage(code) : parseSvgCodeFromMessage(code));
   };
 
   return (
@@ -113,7 +124,7 @@ export default function Home() {
       </div>
       <div className="border w-full md:w-3/4 p-2 flex flex-col">
         <div className="flex-1 flex justify-center border relative">
-          <Mermaid chart={outputCode} />
+          { mode == 'mermaid' ? <Mermaid chart={outputCode} /> : <SVGRender code={outputCode} /> }
         </div>
         <CodeBlock code={draftOutputCode} />
       </div>

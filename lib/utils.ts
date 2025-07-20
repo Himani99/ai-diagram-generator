@@ -15,9 +15,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const systemPrompt = endent`
+const systemPromptMermaid = endent`
   You are an assistant to help user build diagram with Mermaid.
   You only need to return the output Mermaid code block.
+  Do not include any description, do not include the \`\`\`.
+  Code (no \`\`\`):
+  `;
+
+const systemPromptSVG = endent`
+  You are an assistant to help user build diagram with svg.
+  You only need to return the output SVG code block.
   Do not include any description, do not include the \`\`\`.
   Code (no \`\`\`):
   `;
@@ -25,9 +32,11 @@ const systemPrompt = endent`
 export const OpenAIStream = async (
   messages: Message[],
   model: string,
-  key: string
+  key: string,
+  mode: 'mermaid' | 'svg'
 ) => {
-  const system = { role: "system", content: systemPrompt };
+  console.log("DEBUG System Prompt", mode, 'this was the mode used');
+  const system = { role: "system", content: mode == 'mermaid' ? systemPromptMermaid : systemPromptSVG };
   const res = await fetch(`https://api.openai.com/v1/chat/completions`, {
     headers: {
       "Content-Type": "application/json",
@@ -88,20 +97,25 @@ export const OpenAIStream = async (
   return stream;
 };
 
-export const parseCodeFromMessage = (message: string) => {
+export const parseMermaidCodeFromMessage = (message: string) => {
   const regex = /```(?:mermaid)?\s*([\s\S]*?)```/;
   const match = message.match(regex);
 
   if (match) {
     return match[1];
-  } else {
-    return message;
   }
+    return message;
 };
 
-export const serializeCode = (code: string) => {
-  const state = {
-    code: parseCodeFromMessage(code),
+export function parseSvgCodeFromMessage(aiResponse: string){
+    const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
+    const match = aiResponse.match(svgPattern);
+    return match ? match[0] : aiResponse;
+}
+
+export const externalCodeLinkMermaid = (code: string) => {
+  const stateMermaid = {
+    code: parseMermaidCodeFromMessage(code),
     mermaid: JSON.stringify(
       {
         theme: "default",
@@ -112,7 +126,8 @@ export const serializeCode = (code: string) => {
     autoSync: true,
     updateDiagram: true,
   };
-  const data = new TextEncoder().encode(JSON.stringify(state));
+
+  const data = new TextEncoder().encode(JSON.stringify(stateMermaid));
   const compressed = deflate(data, { level: 9 });
-  return fromUint8Array(compressed, true);
+  return `https://mermaid.live/edit#pako:${fromUint8Array(compressed, true)}`;
 };

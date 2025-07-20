@@ -9,6 +9,7 @@ export interface RequestBody {
   messages: Message[];
   model: OpenAIModel;
   apiKey: string;
+  mode: 'mermaid' | 'svg';
 }
 
 export type Theme = "dark" | "neutral" | "default" | "forest" | "base";

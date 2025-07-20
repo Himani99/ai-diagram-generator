@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { useState } from "react";
 import { Copy, HelpCircle, Edit } from "lucide-react";
@@ -8,7 +9,8 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
-import { serializeCode } from "@/lib/utils";
+import { externalCodeLinkMermaid } from "@/lib/utils";
+import { useContextValues } from "@/app/context";
 
 interface Props {
   code: string;
@@ -16,6 +18,7 @@ interface Props {
 
 export const CodeBlock: React.FC<Props> = ({ code }) => {
   const [label, setLabel] = useState<string>("Copy code");
+  const { mode } = useContextValues();
   const copyToClipboard = (text: string) => {
     const el = document.createElement("textarea");
     el.value = text;
@@ -39,7 +42,7 @@ export const CodeBlock: React.FC<Props> = ({ code }) => {
       <div className="bg-black rounded-md mb-4">
         <div className="flex items-center relative text-gray-200 bg-gray-800 px-4 py-2 text-xs font-sans justify-between rounded-t-md">
           <div className="flex">
-            <span>mermaid</span>
+            <span>{mode}</span>
             <HoverCard>
               <HoverCardTrigger>
                 <HelpCircle className="mx-2 h-4 w-4 cursor-pointer" />
@@ -49,12 +52,12 @@ export const CodeBlock: React.FC<Props> = ({ code }) => {
                   <p className="text-xs text-slate-500">
                     Learn more about{" "}
                     <Link
-                      href="https://mermaid.js.org/config/Tutorials.html"
+                      href={mode === "mermaid" ? "https://mermaid.js.org/config/Tutorials.html" : "https://www.svgviewer.dev"}
                       target="_blank"
                       rel="noreferrer"
                       className="underline"
                     >
-                      Mermaid.JS
+                      {mode === "mermaid" ? "Mermaid.js" : "SVG Viewer"}
                     </Link>
                     .
                   </p>
@@ -64,7 +67,7 @@ export const CodeBlock: React.FC<Props> = ({ code }) => {
           </div>
           <div className="flex">
             <Link
-              href={`https://mermaid.live/edit#pako:${serializeCode(code)}`}
+              href={externalCodeLinkMermaid(code)}
               target="_blank"
               rel="noreferrer"
               className="flex ml-auto gap-1 mr-4"
