@@ -5,27 +5,26 @@ import { useAtom } from "jotai";
 
 import { apiKeyAtom, modelAtom } from "@/lib/atom";
 import { Mermaid } from "@/components/Mermaids";
+import SVG from "@/components/SVG";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
 import type { Message, RequestBody } from "@/types/type";
-import { parseMermaidCodeFromMessage, parseSvgCodeFromMessage } from "@/lib/utils";
+import { parseCodeFromMessage, parseCodeFromMessageSVG } from "@/lib/utils";
 import type { OpenAIModel } from "@/types/type";
-import { useContextValues } from "./context";
-import { parse } from "path";
+
 import SVGRender from "@/components/SVG";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
 
-  const { 
-    draftMessage, setDraftMessage, 
-    messages, setMessages, 
-    draftOutputCode, setDraftOutputCode, 
-    outputCode, setOutputCode,
-    mode, setMode
-  } = useContextValues();
+
+  const [draftMessage, setDraftMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [draftOutputCode, setDraftOutputCode] = useState<string>("");
+  const [outputCode, setOutputCode] = useState<string>("");
+  
 
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
@@ -124,7 +123,8 @@ export default function Home() {
       </div>
       <div className="border w-full md:w-3/4 p-2 flex flex-col">
         <div className="flex-1 flex justify-center border relative">
-          { mode == 'mermaid' ? <Mermaid chart={outputCode} /> : <SVGRender code={outputCode} /> }
+          <Mermaid chart={outputCode} />
+          {/* <SVGRender code={draftOutputCode}/> */}
         </div>
         <CodeBlock code={draftOutputCode} />
       </div>

@@ -23,7 +23,7 @@ const systemPromptMermaid = endent`
   `;
 
 const systemPromptSVG = endent`
-  You are an assistant to help user build diagram with svg.
+  You are an assistant to help user build infographics diagram with svg code.
   You only need to return the output SVG code block.
   Do not include any description, do not include the \`\`\`.
   Code (no \`\`\`):
@@ -106,16 +106,21 @@ export const parseMermaidCodeFromMessage = (message: string) => {
   }
     return message;
 };
+export const parseCodeFromMessageSVG = (message: string) => {
+  console.log('DEBUG', message)
+  const regex = /<svg[\s\S]*?<\/svg>/;
+  const match = message.match(regex);
 
-export function parseSvgCodeFromMessage(aiResponse: string){
-    const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
-    const match = aiResponse.match(svgPattern);
-    return match ? match[0] : aiResponse;
-}
+  if (match) {
+    return match[1];
+  } else {
+    return message;
+  }
+};
 
-export const externalCodeLinkMermaid = (code: string) => {
-  const stateMermaid = {
-    code: parseMermaidCodeFromMessage(code),
+export const serializeCode = (code: string) => {
+  const state = {
+    code: parseCodeFromMessage(code),
     mermaid: JSON.stringify(
       {
         theme: "default",

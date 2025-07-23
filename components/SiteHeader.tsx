@@ -24,7 +24,7 @@ export function SiteHeader() {
                 <div
                   className={buttonVariants({
                     size: "sm",
-                    variant: "ghost",
+                    variant: "violet",
                     className: "text-slate-700",
                   })}
                 >
