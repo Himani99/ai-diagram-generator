@@ -14,4 +14,5 @@ const SVGRender: React.FC<SVGRenderProps> = ({ code }) => {
   );
 };
 
+
 export default SVGRender;

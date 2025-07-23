@@ -12,11 +12,14 @@ import { ChatMessage } from "@/components/ChatMessage";
 import type { Message, RequestBody } from "@/types/type";
 import { parseCodeFromMessage, parseCodeFromMessageSVG } from "@/lib/utils";
 import type { OpenAIModel } from "@/types/type";
+
 import SVGRender from "@/components/SVG";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
+
+
   const [draftMessage, setDraftMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [draftOutputCode, setDraftOutputCode] = useState<string>("");
@@ -26,12 +29,16 @@ export default function Home() {
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
     const model = localStorage.getItem("model");
+    const mode = localStorage.getItem("mode") || 'mermaid';
 
     if (apiKey) {
       setApiKey(apiKey);
     }
     if (model) {
       setModel(model as OpenAIModel);
+    }
+    if (mode) {
+      setMode(mode as 'mermaid' | 'svg');
     }
   }, []);
 
@@ -57,7 +64,7 @@ export default function Home() {
     setDraftOutputCode("");
 
     const controller = new AbortController();
-    const body: RequestBody = { messages: newMessages, model, apiKey };
+    const body: RequestBody = { messages: newMessages, model, apiKey, mode };
 
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -91,7 +98,7 @@ export default function Home() {
       code += chunkValue;
       setDraftOutputCode((prevCode) => prevCode + chunkValue);
     }
-    setOutputCode(parseCodeFromMessage(code));
+    setOutputCode(mode === 'mermaid' ? parseMermaidCodeFromMessage(code) : parseSvgCodeFromMessage(code));
   };
 
   return (
