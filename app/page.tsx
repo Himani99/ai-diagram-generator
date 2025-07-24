@@ -4,40 +4,33 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 
 import { apiKeyAtom, modelAtom } from "@/lib/atom";
-import { Mermaid } from "@/components/Mermaids";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
+import DiagramSwitcher from "@/components/ui/DiagramSwitcher";
+
 import type { Message, RequestBody, OpenAIModel } from "@/types/type";
-import { parseMermaidCodeFromMessage, parseSvgCodeFromMessage } from "@/lib/utils";
-import { useContextValues } from "./context";
-import SVGRender from "@/components/SVG";
+import { parseCodeFromMessage } from "@/lib/utils";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
+  const [draftMessage, setDraftMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [draftOutputCode, setDraftOutputCode] = useState<string>("");
+  const [outputCode, setOutputCode] = useState<string>("");
+  const [selectedDiagram, setSelectedDiagram] = useState<"mermaid" | "svg">("mermaid");
 
-  const { 
-    draftMessage, setDraftMessage, 
-    messages, setMessages, 
-    draftOutputCode, setDraftOutputCode, 
-    outputCode, setOutputCode,
-    mode, setMode
-  } = useContextValues();
 
   useEffect(() => {
-    const apiKey = localStorage.getItem("apiKey");
-    const model = localStorage.getItem("model");
-    const mode = localStorage.getItem("mode") || "mermaid";
+    const storedApiKey = localStorage.getItem("apiKey");
+    const storedModel = localStorage.getItem("model");
 
-    if (apiKey) {
-      setApiKey(apiKey);
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
     }
-    if (model) {
-      setModel(model as OpenAIModel);
-    }
-    if (mode) {
-      setMode(mode as "mermaid" | "svg");
+    if (storedModel) {
+      setModel(storedModel as OpenAIModel);
     }
   }, []);
 
@@ -67,9 +60,7 @@ export default function Home() {
 
     const response = await fetch("/api/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       signal: controller.signal,
       body: JSON.stringify(body),
     });
@@ -80,7 +71,6 @@ export default function Home() {
     }
 
     const data = response.body;
-
     if (!data) {
       alert("Something went wrong.");
       return;
@@ -89,32 +79,28 @@ export default function Home() {
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
-    let accumulated = "";
+    let code = "";
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      accumulated += chunkValue;
-      setDraftOutputCode(accumulated); // ✅ FIXED: directly set the updated string
+      code += chunkValue;
+      setDraftOutputCode(prevCode => `${prevCode}${chunkValue}`);
+
     }
 
-    setOutputCode(
-      mode === "mermaid"
-        ? parseMermaidCodeFromMessage(accumulated)
-        : parseSvgCodeFromMessage(accumulated)
-    );
+    setOutputCode(parseCodeFromMessage(code));
   };
 
   return (
     <main className="container flex-1 w-full flex flex-wrap">
+      {/* Sidebar with messages + input */}
       <div className="flex border md:border-r-0 flex-col justify-between w-full md:w-1/4">
         <div>
-          <div>
-            {messages.map((message) => (
-              <ChatMessage key={message.content} message={message.content} />
-            ))}
-          </div>
+          {messages.map((message) => (
+            <ChatMessage key={message.content} message={message.content} />
+          ))}
         </div>
         <div className="w-full p-2">
           <ChatInput
@@ -124,15 +110,13 @@ export default function Home() {
           />
         </div>
       </div>
+
+      {/* Main diagram area */}
       <div className="border w-full md:w-3/4 p-2 flex flex-col">
         <div className="flex-1 flex justify-center border relative">
-          {mode === "mermaid" ? (
-            <Mermaid chart={outputCode} />
-          ) : (
-            <SVGRender code={outputCode} />
-          )}
+          <DiagramSwitcher chart={outputCode} svgCode={draftOutputCode} />
         </div>
-        <CodeBlock code={draftOutputCode} />
+        <CodeBlock code={outputCode} language={selectedDiagram} />
       </div>
     </main>
   );
