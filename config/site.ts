@@ -7,7 +7,7 @@ interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-  name: "GenDiag: Create a diagram with AI",
+  name: "Generate Diagrams and Flowcharts using GenDiag",
   description: "Enter your text in natural language or provide your code for seamless diagram creation",
   mainNav: [
   ],

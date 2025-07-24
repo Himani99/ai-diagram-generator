@@ -5,32 +5,30 @@ import { useAtom } from "jotai";
 
 import { apiKeyAtom, modelAtom } from "@/lib/atom";
 import { Mermaid } from "@/components/Mermaids";
-import SVG from "@/components/SVG";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
-import type { Message, RequestBody } from "@/types/type";
-import { parseCodeFromMessage, parseCodeFromMessageSVG } from "@/lib/utils";
-import type { OpenAIModel } from "@/types/type";
-
+import type { Message, RequestBody, OpenAIModel } from "@/types/type";
+import { parseMermaidCodeFromMessage, parseSvgCodeFromMessage } from "@/lib/utils";
+import { useContextValues } from "./context";
 import SVGRender from "@/components/SVG";
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
-  // little hack
 
-
-  const [draftMessage, setDraftMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [draftOutputCode, setDraftOutputCode] = useState<string>("");
-  const [outputCode, setOutputCode] = useState<string>("");
-  
+  const { 
+    draftMessage, setDraftMessage, 
+    messages, setMessages, 
+    draftOutputCode, setDraftOutputCode, 
+    outputCode, setOutputCode,
+    mode, setMode
+  } = useContextValues();
 
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
     const model = localStorage.getItem("model");
-    const mode = localStorage.getItem("mode") || 'mermaid';
+    const mode = localStorage.getItem("mode") || "mermaid";
 
     if (apiKey) {
       setApiKey(apiKey);
@@ -39,7 +37,7 @@ export default function Home() {
       setModel(model as OpenAIModel);
     }
     if (mode) {
-      setMode(mode as 'mermaid' | 'svg');
+      setMode(mode as "mermaid" | "svg");
     }
   }, []);
 
@@ -91,27 +89,31 @@ export default function Home() {
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
-    let code = "";
+    let accumulated = "";
+
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      code += chunkValue;
-      setDraftOutputCode((prevCode) => prevCode + chunkValue);
+      accumulated += chunkValue;
+      setDraftOutputCode(accumulated); // ✅ FIXED: directly set the updated string
     }
-    setOutputCode(mode === 'mermaid' ? parseMermaidCodeFromMessage(code) : parseSvgCodeFromMessage(code));
+
+    setOutputCode(
+      mode === "mermaid"
+        ? parseMermaidCodeFromMessage(accumulated)
+        : parseSvgCodeFromMessage(accumulated)
+    );
   };
 
   return (
     <main className="container flex-1 w-full flex flex-wrap">
       <div className="flex border md:border-r-0 flex-col justify-between w-full md:w-1/4">
-        <div className="">
-          <div className="">
-            {messages.map((message) => {
-              return (
-                <ChatMessage key={message.content} message={message.content} />
-              );
-            })}
+        <div>
+          <div>
+            {messages.map((message) => (
+              <ChatMessage key={message.content} message={message.content} />
+            ))}
           </div>
         </div>
         <div className="w-full p-2">
@@ -124,8 +126,11 @@ export default function Home() {
       </div>
       <div className="border w-full md:w-3/4 p-2 flex flex-col">
         <div className="flex-1 flex justify-center border relative">
-          <Mermaid chart={outputCode} />
-          {/* <SVGRender code={draftOutputCode}/> */}
+          {mode === "mermaid" ? (
+            <Mermaid chart={outputCode} />
+          ) : (
+            <SVGRender code={outputCode} />
+          )}
         </div>
         <CodeBlock code={draftOutputCode} />
       </div>

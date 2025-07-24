@@ -61,7 +61,7 @@ export const APIKeyInput = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="gpt-4o">gpt-4o</SelectItem>
-            <SelectItem value="gpt-4-turbo">gpt-4-turbo</SelectItem>
+            <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
             <SelectItem value="gpt-4">gpt-4</SelectItem>
             <SelectItem value="gpt-3.5-turbo">gpt-3.5-turbo</SelectItem>
           </SelectContent>

@@ -10,7 +10,7 @@ import { ContextProvider } from "./context";
 export const metadata = {
   title: "Generate Diagrams and Flowcharts using GenDiag",
   description:
-    "Create flowcharts, sequence diagrams, class diagrams, user journeys, Gantt charts, C4 models, mind maps, and timelines effortlessly — just by using natural language. GenDiag turns your ideas into professional diagrams in seconds.",
+    "Draw flowchart, sequence diagram, class diagram, user journey, gantt, C4C, Mindmap, Timeline diagram with nature language.",
 };
 
 const fontSans = FontSans({
