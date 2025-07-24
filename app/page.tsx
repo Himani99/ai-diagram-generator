@@ -18,6 +18,7 @@ import SVGRender from "@/components/SVG";
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
+  // little hack
 
   const { 
     draftMessage, setDraftMessage, 
