@@ -17,23 +17,23 @@ const DiagramModalView: React.FC<Props> = ({ isOpen, onClose, code, mode }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
-    if (mode === "mermaid" && code && mermaidRef.current) {
-      mermaid.initialize({ startOnLoad: false });
-      mermaid.render("theGraph", code, (svgCode) => {
-        mermaidRef.current!.innerHTML = svgCode;
-      });
-    }
-  }, [code, mode]);
+    const renderMermaid = async () => {
+      if (mode === "mermaid" && code && mermaidRef.current) {
+        mermaid.initialize({ startOnLoad: false });
+        try {
+          const { svg } = await mermaid.render("theGraph", code);
+          mermaidRef.current.innerHTML = svg;
+        } catch (err) {
+          mermaidRef.current.innerHTML = `<pre class='text-red-500'>Invalid Mermaid syntax</pre>`;
+        }
+      }
+    };
+    renderMermaid();
+  }, [code, isOpen, mode]); // ✅ fixed here
 
+  // ✅ placeholder for download
   const handleDownload = () => {
-    const blob = new Blob([code], {
-      type: mode === "svg" ? "image/svg+xml" : "text/plain",
-    });
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `diagram.${mode === "svg" ? "svg" : "mmd"}`;
-    link.click();
+    alert("Download feature coming soon!");
   };
 
   return (
