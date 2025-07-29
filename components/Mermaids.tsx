@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
 import { Copy, Palette } from "lucide-react";
+import { replaceKeywordsWithIcons } from "@/lib/iconMap"; // at the top
 
 import {
   Select,
@@ -92,7 +93,8 @@ export function Mermaid({ chart }: MermaidProps) {
         logLevel: 5,
       });
       try {
-        const { svg } = await mermaid.mermaidAPI.render("mermaid-svg", chart);
+        const enhancedChart = replaceKeywordsWithIcons(chart); // 🧠 Enhance it
+        const { svg } = await mermaid.mermaidAPI.render("mermaid-svg", enhancedChart); // use modified chart
         container.innerHTML = svg;
       } catch (err) {
         container.innerHTML = `<div style='color:red;'>Mermaid syntax error: ${err}</div>`;

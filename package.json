@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-hover-card": "^1.0.5",
     "@radix-ui/react-label": "^2.0.1",
     "@radix-ui/react-popover": "^1.0.5",
@@ -19,7 +19,7 @@
     "@types/react-dom": "18.0.11",
     "@vercel/analytics": "^0.1.11",
     "buffer": "^6.0.3",
-    "class-variance-authority": "^0.5.1",
+    "class-variance-authority": "^0.5.3",
     "clsx": "^1.2.1",
     "dompurify": "^3.2.6",
     "endent": "^2.1.0",
@@ -35,7 +35,8 @@
     "pako": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-merge": "^1.11.0",
+    "tailwind-merge": "^1.14.0",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "5.0.3"
   },
   "devDependencies": {

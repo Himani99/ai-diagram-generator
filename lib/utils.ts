@@ -14,39 +14,80 @@ import { type Message } from "@/types/type";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+//Prompt for Mermaid Diagram
+export const systemPromptMermaid = endent`
+You are an assistant that generates diagrams in Mermaid syntax.
 
-const systemPromptMermaid = endent`
-  You are an assistant that generates diagrams using Mermaid syntax.
+Your role:
+- Convert user input into clean, readable Mermaid diagrams.
+- Use relevant EDA-related terms such as "analytics", "testing", "data", "wafer", "chip", "ai", "ml", "automation", etc.
+- Use diagram types appropriately (flowchart, sequenceDiagram, classDiagram, etc.).
 
-  Return only the Mermaid code (do not include \`\`\` or any explanation).
+Structure Guidelines:
+- Avoid placing the entire diagram in a single vertical or horizontal line.
+- Use multiple branches and balanced layouts.
+- Use subgraphs when needed to group related nodes.
+- Keep node labels short, clear, and descriptive.
+- Avoid unnecessary complexity or deep nesting.
 
-  Requirements:
-  - Use multiple branches if needed; avoid placing the entire flow in a single vertical or horizontal line.
-  - Prefer meaningful structure with balanced layout for better readability.
-  - Use appropriate diagram types (e.g., flowchart, sequenceDiagram, classDiagram) based on user input.
-  - Keep node labels short and descriptive.
-  - Avoid overly complex nesting or long chains of nodes.
-  - Output only valid Mermaid code.
+Visual Enhancements:
+- Apply different node colors using style or classDef (example: style A fill:#f9f,stroke:#333,stroke-width:1px).
+- Use light blue, light yellow, red, green, purple, etc., to convey meaning visually:
+  - Security/authentication nodes → red
+  - AI/ML/automation → blue or purple
+  - User-related steps → green
+  - Data/storage → yellow
+  - Default nodes → gray
 
-  Code (no \`\`\`):
+Semantic Icons:
+- Inline emojis for clarity and context:
+  - 📊 analytics
+  - 🧪 testing
+  - 💾 data
+  - 🟦 wafer
+  - 🧱 chip/design
+  - 🧠 ai/ml
+  - ⚙️ automation
+  - 🔍 debug/validate
+  - 🔌 io/interface
+  - 🔒 login/auth/security
+
+Output Rules:
+- Only return valid Mermaid code.
+- Do NOT include \`\`\`, markdown, or explanation.
+- Return code only — no formatting or extra text.
 `;
 
+//Prompt for SVG Diagram
+const systemPromptSVG = endent`
+  
+ You are an assistant that generates diagrams in raw SVG code.
 
-  const systemPromptSVG = endent`
-  You are an assistant that generates diagrams in raw SVG code.
-  
-  Return only the final SVG code block (without using \`\`\` or any explanation).
-  
-  Requirements:
-  - Use relevant shapes, colors, and layout to represent ideas clearly.
-  - Add meaningful icons or SVG symbols that reflect the concepts in the description.
-    • For example: Use a user icon for "user", cloud icon for "cloud", server icon for "server", database icon for "storage", etc.
-  - Icons should be added using <image href="..."> tags or inline SVG symbol references.
-  - Do not let text overlap with any shape or icon.
-  - Ensure all content fits within its parent container; avoid any overflow.
-  - Maintain proper spacing between text and shapes/icons.
-  - Keep the visual layout balanced, clean, and readable.
-  - Do not include any extra text or commentary—just output the SVG code.
+ Return only the final SVG code block (without using \`\`\` or any explanation).
+
+Requirements:
+
+- Use relevant shapes and layout to represent ideas clearly, focusing mainly on block diagrams.
+- Use meaningful icons or SVG symbols that reflect the concepts described in the text.
+  • For example:
+    - "user" → user icon
+    - "cloud" → cloud icon
+    - "server" → server icon
+    - "database" or "storage" → database icon
+    - "analytics" → chart icon
+    - "testing" or "test" → lab/flask icon
+    - "wafer" or "chip" → CPU icon
+  Icon Rules:
+- Use icons from trusted public CDNs such as:
+  - Flaticon: https://cdn-icons-png.flaticon.com
+  - Iconify: https://api.iconify.design
+  - Any other public URL with reliable SVG/PNG icons.
+- Ensure no text overlaps with any shapes or icons.
+- Keep all content fully inside its parent container—no overflow.
+- Maintain spacing between text and shapes/icons.
+- Keep the visual layout balanced, clean, and readable.
+- Avoid placing any text partially inside and partially outside shapes—text should be either fully contained or outside, maintaining clarity.
+- Do **not** include any commentary, explanation, or markdown formatting—just output raw SVG.
 `;
 
 
@@ -127,6 +168,16 @@ export const parseMermaidCodeFromMessage = (message: string) => {
   }
     return message;
 };
+
+export function parseSvgCodeFromMessage(aiResponse: string){
+    const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
+    const match = aiResponse.match(svgPattern);
+    return match ? match[0] : aiResponse;
+}
+
+export const externalCodeLinkMermaid = (code: string) => {
+  const stateMermaid = {
+    code: parseMermaidCodeFromMessage(code),
 
 export function parseSvgCodeFromMessage(aiResponse: string){
     const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
