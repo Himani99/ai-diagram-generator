@@ -59,10 +59,10 @@ const DiagramModalView: React.FC<Props> = ({ isOpen, onClose, code, mode }) => {
 
         {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
-          <Button variant="default" onClick={handleDownload}>
+          <Button variant="violet" onClick={handleDownload}>
             Download
           </Button>
-          <Button variant="success" onClick={() => setPreviewVisible(true)}>
+          <Button variant="default" onClick={() => setPreviewVisible(true)}>
             Preview
           </Button>
           <Button variant="outline" onClick={onClose}>

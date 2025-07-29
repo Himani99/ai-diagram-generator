@@ -11,10 +11,12 @@ import { fromUint8Array } from "js-base64";
 
 import { type Message } from "@/types/type";
 
+// Utility function to merge Tailwind classes
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-//Prompt for Mermaid Diagram
+
+// Prompt for Mermaid Diagram
 export const systemPromptMermaid = endent`
 You are an assistant that generates diagrams in Mermaid syntax.
 
@@ -58,12 +60,11 @@ Output Rules:
 - Return code only — no formatting or extra text.
 `;
 
-//Prompt for SVG Diagram
+// Prompt for SVG Diagram
 const systemPromptSVG = endent`
-  
- You are an assistant that generates diagrams in raw SVG code.
+You are an assistant that generates diagrams in raw SVG code.
 
- Return only the final SVG code block (without using \`\`\` or any explanation).
+Return only the final SVG code block (without using \`\`\` or any explanation).
 
 Requirements:
 
@@ -77,7 +78,7 @@ Requirements:
     - "analytics" → chart icon
     - "testing" or "test" → lab/flask icon
     - "wafer" or "chip" → CPU icon
-  Icon Rules:
+Icon Rules:
 - Use icons from trusted public CDNs such as:
   - Flaticon: https://cdn-icons-png.flaticon.com
   - Iconify: https://api.iconify.design
@@ -90,15 +91,18 @@ Requirements:
 - Do **not** include any commentary, explanation, or markdown formatting—just output raw SVG.
 `;
 
-
 export const OpenAIStream = async (
   messages: Message[],
   model: string,
   key: string,
-  mode: 'mermaid' | 'svg'
+  mode: "mermaid" | "svg"
 ) => {
-  console.log("DEBUG System Prompt", mode, 'this was the mode used');
-  const system = { role: "system", content: mode == 'mermaid' ? systemPromptMermaid : systemPromptSVG };
+  console.log("DEBUG System Prompt", mode, "this was the mode used");
+  const system = {
+    role: "system",
+    content: mode === "mermaid" ? systemPromptMermaid : systemPromptSVG,
+  };
+
   const res = await fetch(`https://api.openai.com/v1/chat/completions`, {
     headers: {
       "Content-Type": "application/json",
@@ -159,6 +163,7 @@ export const OpenAIStream = async (
   return stream;
 };
 
+// Extract Mermaid code from message content
 export const parseMermaidCodeFromMessage = (message: string) => {
   const regex = /```(?:mermaid)?\s*([\s\S]*?)```/;
   const match = message.match(regex);
@@ -166,25 +171,17 @@ export const parseMermaidCodeFromMessage = (message: string) => {
   if (match) {
     return match[1];
   }
-    return message;
+  return message;
 };
 
-export function parseSvgCodeFromMessage(aiResponse: string){
-    const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
-    const match = aiResponse.match(svgPattern);
-    return match ? match[0] : aiResponse;
+// Extract SVG code from message content
+export function parseSvgCodeFromMessage(aiResponse: string) {
+  const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
+  const match = aiResponse.match(svgPattern);
+  return match ? match[0] : aiResponse;
 }
 
-export const externalCodeLinkMermaid = (code: string) => {
-  const stateMermaid = {
-    code: parseMermaidCodeFromMessage(code),
-
-export function parseSvgCodeFromMessage(aiResponse: string){
-    const svgPattern = /(<svg[\s\S]*?<\/svg>)/;
-    const match = aiResponse.match(svgPattern);
-    return match ? match[0] : aiResponse;
-}
-
+// Generate external Mermaid Live Editor link
 export const externalCodeLinkMermaid = (code: string) => {
   const stateMermaid = {
     code: parseMermaidCodeFromMessage(code),

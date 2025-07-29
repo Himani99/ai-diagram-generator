@@ -7,40 +7,14 @@ import { apiKeyAtom, modelAtom } from "@/lib/atom";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ChatMessage } from "@/components/ChatMessage";
-<<<<<<< HEAD
-import DiagramSwitcher from "@/components/ui/DiagramSwitcher";
-
-import type { Message, RequestBody, OpenAIModel } from "@/types/type";
-import { parseCodeFromMessage } from "@/lib/utils";
-=======
 import type { Message, RequestBody, OpenAIModel } from "@/types/type";
 import { parseMermaidCodeFromMessage, parseSvgCodeFromMessage } from "@/lib/utils";
 import { useContextValues } from "./context";
 import DiagramModalView from "@/components/DiagramModalView";
->>>>>>> a07b084 (feat: enable diagram live preview and code editing in modal)
 
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
-<<<<<<< HEAD
-  const [draftMessage, setDraftMessage] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [draftOutputCode, setDraftOutputCode] = useState<string>("");
-  const [outputCode, setOutputCode] = useState<string>("");
-  const [selectedDiagram, setSelectedDiagram] = useState<"mermaid" | "svg">("mermaid");
-
-
-  useEffect(() => {
-    const storedApiKey = localStorage.getItem("apiKey");
-    const storedModel = localStorage.getItem("model");
-
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-    }
-    if (storedModel) {
-      setModel(storedModel as OpenAIModel);
-    }
-=======
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
@@ -60,7 +34,6 @@ export default function Home() {
     if (storedKey) setApiKey(storedKey);
     if (storedModel) setModel(storedModel as OpenAIModel);
     if (storedMode) setMode(storedMode as "mermaid" | "svg");
->>>>>>> a07b084 (feat: enable diagram live preview and code editing in modal)
   }, []);
 
   // Open modal when diagram is ready
@@ -111,16 +84,12 @@ export default function Home() {
       setDraftOutputCode(accumulated);
     }
 
-<<<<<<< HEAD
-    setOutputCode(parseCodeFromMessage(code));
-=======
     const finalCode =
       mode === "mermaid"
         ? parseMermaidCodeFromMessage(accumulated)
         : parseSvgCodeFromMessage(accumulated);
 
     setOutputCode(finalCode);
->>>>>>> a07b084 (feat: enable diagram live preview and code editing in modal)
   };
 
   return (
